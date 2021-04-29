@@ -1,0 +1,2 @@
+To generate c code from a .l file run:
+flex -l FILE_NAME
