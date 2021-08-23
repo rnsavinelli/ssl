@@ -138,7 +138,7 @@ token_t get_token(void)
 			if(is_space(character) || is_newline(character)) {
 
 				if(token.content != NULL) break;
-                
+
 				else continue;
 
 			}
@@ -150,7 +150,7 @@ token_t get_token(void)
 
 			}
 
-            token.type = get_token_type(character);
+			token.type = get_token_type(character);
 
 		} else {
 

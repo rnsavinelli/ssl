@@ -35,7 +35,7 @@
 #define ERROR -1
 
 enum TOKENS {
-    UNDEFINED,
+	UNDEFINED,
 	CAD,
 	FDT = EOF,
 	SEP = ','
