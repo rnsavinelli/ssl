@@ -26,117 +26,155 @@
 
 static bool is_terminal(int character)
 {
-    return get_token_type(character) == FDT || get_token_type(character) == SEP ? true : false;
+	return get_token_type(character) == FDT || get_token_type(character) == SEP;
 }
 
 static bool is_space(int character)
 {
-    return isspace(character);
+	return isspace(character);
 }
 
-static bool is_newline(int character) {
-    return character == '\n';
+static bool is_newline(int character)
+{
+	return character == '\n';
+}
+
+static char * store_character(token_t *token, int character)
+{
+	if(token->content == NULL) {
+
+		token->content_size = sizeof(*(token->content)) * 2;
+		token->content = (char *) malloc(token->content_size);
+
+		if (token->content != NULL) {
+
+			*(token->content) = (char) character;
+			*(token->content + 1) = '\0';
+
+		}
+
+	} else {
+
+		token->content_size += sizeof(*(token->content));
+		token->content = (char *) realloc(token->content, token->content_size);
+
+		if (token->content != NULL) {
+
+			sprintf(token->content, "%s%c", (const char *) token->content, (char) character);
+
+		}
+	}
+
+	return token->content;
 }
 
 // EO static methods
 
 void token_purge(token_t *token)
 {
-    token->type = 0;
-    token->content_size = 0;
-    
-    if (token->content != NULL) {
-        free(token->content);
-        token->content = NULL;
-    }
+	token->type = UNDEFINED;
+	token->content_size = 0;
+
+	if (token->content != NULL) {
+
+		free(token->content);
+		token->content = NULL;
+
+	}
 }
 
 int get_token_type(int character)
 {
-    switch (character) {
-        case EOF:
-            return FDT;
-        case ',':
-            return SEP;
-        default:
-            return CAD;
-    }
-}
+	switch (character) {
 
+	case EOF:
+		return FDT;
+
+	case ',':
+		return SEP;
+
+	default:
+		return CAD;
+
+	}
+}
 
 void print_token(token_t token)
 {
-    switch (token.type) {
-    case FDT:
-        printf("Fin de texto");
-        break;
-    case SEP:
-        printf("Separador");
-        break;
-    default:
-        printf("Cadena");
-        break;
-    }
-    printf(": %s\n", token.content);
+	switch (token.type) {
+
+	case FDT:
+		printf("Fin de texto");
+		break;
+
+	case SEP:
+		printf("Separador");
+		break;
+
+	default:
+		printf("Cadena");
+		break;
+
+	}
+
+	printf(": %s\n", token.content);
 }
 
 token_t get_token(void)
 {
-    int character = EOF;
+	int character = EOF;
 
-    token_t token = {
-        .type = 0,
-        .content = NULL,
-        .content_size = 0
-    };
+	token_t token = {
+		.type = UNDEFINED,
+		.content = NULL,
+		.content_size = 0
+	};
 
-    do {
-        character = getchar();
+	do {
+		character = getchar();
 
-        if(not(is_terminal(character))) {
+		if(not(is_terminal(character))) {
 
-            if(is_space(character) || is_newline(character)) {
-                if(token.content != NULL) {
-                    break;
-                }
+			if(is_space(character) || is_newline(character)) {
 
-                else continue;
-            }
+				if(token.content != NULL) break;
+                
+				else continue;
 
-            if(token.content == NULL) {
-                token.content_size = sizeof(*(token.content)) * 2;
-                token.content = (char *) malloc(token.content_size);
+			}
 
-                *(token.content) = (char) character;
-                *(token.content + 1) = '\0';
+			if(store_character(&token, character) == NULL) {
 
-            } else {
-                token.content_size += sizeof(*(token.content));
-                token.content = (char *) realloc(token.content, token.content_size);
+				perror("Memory allocation request failed");
+				exit(ERROR);
 
-                sprintf(token.content, "%s%c", (const char *) token.content, (char) character);
-            }
-        }
+			}
 
-        else {
-            if (token.content != NULL) {
-                ungetc(character, stdin);
-                break;
+            token.type = get_token_type(character);
 
-            } else {
-                token.content_size = sizeof(*(token.content)) * 2;
-                token.content = (char *) malloc(token.content_size);
+		} else {
 
-                *(token.content) = (char) character;
-                *(token.content + 1) = '\0';
+			if (token.content != NULL) {
 
-                token.type = get_token_type(character);
+				ungetc(character, stdin);
 
-                return token;
-            }
-        }
+			} else {
 
-    } while(not(is_terminal(character)));
+				if(store_character(&token, character) == NULL) {
 
-    return token;
+					perror("Memory allocation request failed");
+					exit(ERROR);
+
+				}
+
+				token.type = get_token_type(character);
+
+			}
+
+			break;
+		}
+
+	} while(not(is_terminal(character)));
+
+	return token;
 }

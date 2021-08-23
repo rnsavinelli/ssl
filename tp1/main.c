@@ -25,19 +25,19 @@
 
 int main(void)
 {
-    token_t token = {
-        .type = 0,
-        .content = NULL,
-        .content_size = 0
-    };
+	token_t token = {
+		.type = UNDEFINED,
+		.content = NULL,
+		.content_size = 0
+	};
 
-    do {
-        token_purge(&token);
-        token = get_token();
-        print_token(token);
-    } while (token.type != FDT);
+	do {
+		token_purge(&token);
+		token = get_token();
+		print_token(token);
+	} while (token.type != FDT);
 
-    token_purge(&token);
+	token_purge(&token);
 
-    return 0;
+	return 0;
 }

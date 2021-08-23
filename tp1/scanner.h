@@ -32,22 +32,25 @@
 #include <stdlib.h>
 
 #define not !
+#define ERROR -1
 
 enum TOKENS {
-    CAD,
-    FDT = EOF,
-    SEP = ','
+    UNDEFINED,
+	CAD,
+	FDT = EOF,
+	SEP = ','
 };
 
 typedef struct token {
-    int type;
-    char * content;
-    size_t content_size;
+	int type;
+	char * content;
+	size_t content_size;
 } token_t;
 
 int get_token_type(int character);
 
 void print_token(token_t token);
+
 void token_purge(token_t *token);
 
 token_t get_token(void);
