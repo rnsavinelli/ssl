@@ -1,78 +1,68 @@
+/*
+ * scanner.c
+ *
+ * Copyright 2021 Roberto Nicolás Savinelli <rnsavinelli@frba.utn.edu.ar>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1301, USA.
+ *
+ */
+
 #include "scanner.h"
 
-int get_character_type(int character)
+// BO static methods
+
+static bool is_terminal(int character)
 {
-    switch (character) {
-    case EOF:
-        return FDT;
-    case ',':
-        return SEP;
-    default:
-        return CAD;
+    return get_token_type(character) == FDT || get_token_type(character) == SEP ? true : false;
+}
+
+static bool is_space(int character)
+{
+    return isspace(character);
+}
+
+static bool is_newline(int character) {
+    return character == '\n';
+}
+
+// EO static methods
+
+void token_purge(token_t *token)
+{
+    token->type = 0;
+    token->content_size = 0;
+    
+    if (token->content != NULL) {
+        free(token->content);
+        token->content = NULL;
     }
 }
 
-bool character_is_terminal(int character)
+int get_token_type(int character)
 {
-    return
-        get_character_type(character) == FDT ||
-        get_character_type(character) == SEP ? true : false;
+    switch (character) {
+        case EOF:
+            return FDT;
+        case ',':
+            return SEP;
+        default:
+            return CAD;
+    }
 }
 
-bool character_is_not_terminal(int character)
-{
-    return ! character_is_terminal(character);
-}
-
-token_t get_token()
-{
-    int character = EOF;
-    size_t content_size = 0;
-
-    token_t token = {
-        .type = 0,
-        .content = NULL
-    };
-
-    do {
-        character = getchar();
-
-        if(character_is_not_terminal(character)) {
-            if(token.content == NULL) {
-                content_size = sizeof(*(token.content)*2);
-                token.content = (char *) malloc(content_size);
-                *(token.content) = (char) character;
-                *(token.content + 1) = '\0';
-            } else {
-                content_size += sizeof(*(token.content));
-                token.content = (char *) realloc(token.content, content_size);
-                sprintf(token.content, "%s%c", (const char *) token.content, (char) character);
-            }
-        }
-
-        else {
-            if (token.content != NULL) {
-                ungetc(character, stdin);
-                break;
-
-            } else {
-                content_size = sizeof(*(token.content)*2);
-                token.content = (char *) malloc(content_size);
-                *(token.content) = (char) character;
-                *(token.content + 1) = '\0';
-
-                token.type = get_character_type(character);
-
-                return token;
-            }
-        }
-
-    } while(character_is_not_terminal(character));
-
-    token.type = CAD;
-
-    return token;
-}
 
 void print_token(token_t token)
 {
@@ -90,8 +80,63 @@ void print_token(token_t token)
     printf(": %s\n", token.content);
 }
 
-void token_reset(token_t *token)
+token_t get_token(void)
 {
-    token->type = 0;
-    token->content = NULL;
+    int character = EOF;
+
+    token_t token = {
+        .type = 0,
+        .content = NULL,
+        .content_size = 0
+    };
+
+    do {
+        character = getchar();
+
+        if(not(is_terminal(character))) {
+
+            if(is_space(character) || is_newline(character)) {
+                if(token.content != NULL) {
+                    break;
+                }
+
+                else continue;
+            }
+
+            if(token.content == NULL) {
+                token.content_size = sizeof(*(token.content)) * 2;
+                token.content = (char *) malloc(token.content_size);
+
+                *(token.content) = (char) character;
+                *(token.content + 1) = '\0';
+
+            } else {
+                token.content_size += sizeof(*(token.content));
+                token.content = (char *) realloc(token.content, token.content_size);
+
+                sprintf(token.content, "%s%c", (const char *) token.content, (char) character);
+            }
+        }
+
+        else {
+            if (token.content != NULL) {
+                ungetc(character, stdin);
+                break;
+
+            } else {
+                token.content_size = sizeof(*(token.content)) * 2;
+                token.content = (char *) malloc(token.content_size);
+
+                *(token.content) = (char) character;
+                *(token.content + 1) = '\0';
+
+                token.type = get_token_type(character);
+
+                return token;
+            }
+        }
+
+    } while(not(is_terminal(character)));
+
+    return token;
 }
