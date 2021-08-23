@@ -1,5 +1,5 @@
-# C++ Makefile using gcc and gdb
-# Roberto Nicolás Savinelli <rsavinelli@est.frba.utn.edu.ar>
+# C Makefile using gcc and gdb
+# Roberto Nicolás Savinelli <rsavinelli@frba.utn.edu.ar>
 
 CC = gcc
 CFLAGS = -std=c17 -Wall -pedantic-errors
