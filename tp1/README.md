@@ -2,9 +2,9 @@
 
 ### Makefile referece
 
-Behaviour testing has been automated with the ``test`` tag inside the [Makefile](tp1/Makefile).
+Behaviour testing has been automated with the ``test`` tag inside the [Makefile](Makefile).
 
-This is, to test the program behaviour with the contents of [entrada.txt](tp1/entrada.txt) run:
+This is, to test the program behaviour with the contents of [entrada.txt](entrada.txt) run:
 
 ```
 $ make test
