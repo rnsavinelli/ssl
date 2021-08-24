@@ -32,7 +32,7 @@ Cadena: ultimo
 Fin de texto: �
 ```
 
-## About
+## Author's notice
 
 - The standard c17 has been adopted as a requisite.
 - Valgrind is used to check for memory leaks.
