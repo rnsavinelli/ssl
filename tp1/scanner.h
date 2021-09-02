@@ -34,25 +34,25 @@
 #define not !
 #define ERROR -1
 
-enum TOKENS {
+typedef enum TOKENS {
 	UNDEFINED,
 	CAD,
 	FDT = EOF,
 	SEP = ','
-};
-
-typedef struct token {
-	int type;
-	char * content;
-	size_t content_size;
 } token_t;
 
-int get_token_type(int character);
+typedef struct word {
+	token_t token;
+	char * content;
+	size_t content_size;
+} word_t;
 
-void print_token(token_t token);
+token_t get_token(int character);
 
-void token_purge(token_t *token);
+void print_word(word_t word);
 
-token_t get_token(void);
+void word_purge(word_t *word);
+
+word_t get_word(void);
 
 #endif /* SCANNER_H_ */

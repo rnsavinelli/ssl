@@ -26,7 +26,8 @@
 
 static bool is_terminal(int character)
 {
-	return get_token_type(character) == FDT || get_token_type(character) == SEP;
+	token_t token = get_token(character);
+	return token == FDT || token == SEP;
 }
 
 static bool is_space(int character)
@@ -39,51 +40,51 @@ static bool is_newline(int character)
 	return character == '\n';
 }
 
-static char * store_character(token_t *token, int character)
+static char * store_character(word_t *word, int character)
 {
-	if(token->content == NULL) {
+	if(word->content == NULL) {
 
-		token->content_size = sizeof(*(token->content)) * 2;
-		token->content = (char *) malloc(token->content_size);
+		word->content_size = sizeof(*(word->content)) * 2;
+		word->content = (char *) malloc(word->content_size);
 
-		if (token->content != NULL) {
+		if (word->content != NULL) {
 
-			*(token->content) = (char) character;
-			*(token->content + 1) = '\0';
+			*(word->content) = (char) character;
+			*(word->content + 1) = '\0';
 
 		}
 
 	} else {
 
-		token->content_size += sizeof(*(token->content));
-		token->content = (char *) realloc(token->content, token->content_size);
+		word->content_size += sizeof(*(word->content));
+		word->content = (char *) realloc(word->content, word->content_size);
 
-		if (token->content != NULL) {
+		if (word->content != NULL) {
 
-			sprintf(token->content, "%s%c", (const char *) token->content, (char) character);
+			sprintf(word->content, "%s%c", (const char *) word->content, (char) character);
 
 		}
 	}
 
-	return token->content;
+	return word->content;
 }
 
 // EO static methods
 
-void token_purge(token_t *token)
+void word_purge(word_t *word)
 {
-	token->type = UNDEFINED;
-	token->content_size = 0;
+	word->token = UNDEFINED;
+	word->content_size = 0;
 
-	if (token->content != NULL) {
+	if (word->content != NULL) {
 
-		free(token->content);
-		token->content = NULL;
+		free(word->content);
+		word->content = NULL;
 
 	}
 }
 
-int get_token_type(int character)
+token_t get_token(int character)
 {
 	switch (character) {
 
@@ -99,9 +100,9 @@ int get_token_type(int character)
 	}
 }
 
-void print_token(token_t token)
+void print_word(word_t word)
 {
-	switch (token.type) {
+	switch (word.token) {
 
 	case FDT:
 		printf("Fin de texto");
@@ -117,15 +118,15 @@ void print_token(token_t token)
 
 	}
 
-	printf(": %s\n", token.content);
+	printf(": %s\n", word.content);
 }
 
-token_t get_token(void)
+word_t get_word(void)
 {
 	int character = EOF;
 
-	token_t token = {
-		.type = UNDEFINED,
+	word_t word = {
+		.token = UNDEFINED,
 		.content = NULL,
 		.content_size = 0
 	};
@@ -137,37 +138,37 @@ token_t get_token(void)
 
 			if(is_space(character) || is_newline(character)) {
 
-				if(token.content != NULL) break;
+				if(word.content != NULL) break;
 
 				else continue;
 
 			}
 
-			if(store_character(&token, character) == NULL) {
+			word.token = get_token(character);
+
+			if(store_character(&word, character) == NULL) {
 
 				perror("Memory allocation request failed");
 				exit(ERROR);
 
-			}
-
-			token.type = get_token_type(character);
+			}			
 
 		} else {
 
-			if (token.content != NULL) {
+			if (word.content != NULL) {
 
 				ungetc(character, stdin);
 
 			} else {
 
-				if(store_character(&token, character) == NULL) {
+				if(store_character(&word, character) == NULL) {
 
 					perror("Memory allocation request failed");
 					exit(ERROR);
 
 				}
 
-				token.type = get_token_type(character);
+				word.token = get_token(character);
 
 			}
 
@@ -176,5 +177,5 @@ token_t get_token(void)
 
 	} while(not(is_terminal(character)));
 
-	return token;
+	return word;
 }
