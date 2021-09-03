@@ -24,158 +24,121 @@
 
 // BO static methods
 
-static bool is_terminal(int character)
-{
-	token_t token = get_token(character);
-	return token == FDT || token == SEP;
-}
-
-static bool is_space(int character)
-{
-	return isspace(character);
-}
-
-static bool is_newline(int character)
+static bool isnewline(int character)
 {
 	return character == '\n';
 }
 
-static char * store_character(word_t *word, int character)
+static bool is_escape_sequence(int character)
 {
-	if(word->content == NULL) {
+	return isspace(character) || isnewline(character);
+}
 
-		word->content_size = sizeof(*(word->content)) * 2;
-		word->content = (char *) malloc(word->content_size);
+static bool is_cad(int charcater) {
+	return not(charcater == EOF || charcater == SEP);
+}
 
-		if (word->content != NULL) {
+static char * store_character(char **buffer, int character)
+{
+	size_t buffer_size = 0;
 
-			*(word->content) = (char) character;
-			*(word->content + 1) = '\0';
+	if(*buffer == NULL) {
 
+		buffer_size = sizeof(char) + sizeof('\0');
+		*buffer = (char *) malloc(buffer_size);
+
+		if (*buffer != NULL) {
+			*(*buffer) = character;
+			*(*buffer + 1) = '\0';
 		}
 
 	} else {
 
-		word->content_size += sizeof(*(word->content));
-		word->content = (char *) realloc(word->content, word->content_size);
+		buffer_size = strlen(*buffer) + sizeof(char) + sizeof('\0');
+		*buffer = (char *) realloc(*buffer, buffer_size);
 
-		if (word->content != NULL) {
-
-			sprintf(word->content, "%s%c", (const char *) word->content, (char) character);
-
+		if (*buffer != NULL) {
+			sprintf(*buffer, "%s%c", (const char *) *buffer, (char) character);
 		}
 	}
 
-	return word->content;
+	return *buffer;
 }
 
 // EO static methods
 
 void word_purge(word_t *word)
 {
-	word->token = UNDEFINED;
-	word->content_size = 0;
+	word->token = FDT;
 
-	if (word->content != NULL) {
+	if (word->morpheme != NULL) {
 
-		free(word->content);
-		word->content = NULL;
+		free(word->morpheme);
+		word->morpheme = NULL;
 
 	}
 }
 
-token_t get_token(int character)
+token_t get_token(char ** morpheme)
 {
-	switch (character) {
+	int character = EOF;
 
-	case EOF:
-		return FDT;
+	while((character = getchar()) != EOF) {
 
-	case ',':
-		return SEP;
+		if(is_escape_sequence(character))
+			continue;
 
-	default:
-		return CAD;
+		switch (character) {
+			case SEP:
+				store_character(morpheme, character);
+				return SEP;
 
+			default:
+				do {
+					if(is_escape_sequence(character)) {
+						break;
+					}
+					store_character(morpheme, character);
+
+				} while (is_cad(character = getchar()));
+
+				ungetc(character, stdin);
+				return CAD;
+		}
 	}
+
+	store_character(morpheme, character);
+	return FDT;
 }
 
 void print_word(word_t word)
 {
 	switch (word.token) {
 
-	case FDT:
-		printf("Fin de texto");
-		break;
+		case FDT:
+			printf("Fin de texto");
+			break;
 
-	case SEP:
-		printf("Separador");
-		break;
+		case SEP:
+			printf("Separador");
+			break;
 
-	default:
-		printf("Cadena");
-		break;
-
+		default /* CAD */:
+			printf("Cadena");
+			break;
 	}
 
-	printf(": %s\n", word.content);
+	printf(": %s\n", word.morpheme);
 }
 
 word_t get_word(void)
 {
-	int character = EOF;
-
 	word_t word = {
-		.token = UNDEFINED,
-		.content = NULL,
-		.content_size = 0
+		.token = FDT,
+		.morpheme = NULL,
 	};
-
-	do {
-		character = getchar();
-
-		if(not(is_terminal(character))) {
-
-			if(is_space(character) || is_newline(character)) {
-
-				if(word.content != NULL) break;
-
-				else continue;
-
-			}
-
-			word.token = get_token(character);
-
-			if(store_character(&word, character) == NULL) {
-
-				perror("Memory allocation request failed");
-				exit(ERROR);
-
-			}			
-
-		} else {
-
-			if (word.content != NULL) {
-
-				ungetc(character, stdin);
-
-			} else {
-
-				if(store_character(&word, character) == NULL) {
-
-					perror("Memory allocation request failed");
-					exit(ERROR);
-
-				}
-
-				word.token = get_token(character);
-
-			}
-
-			break;
-		}
-
-	} while(not(is_terminal(character)));
+	
+	word.token = get_token(&word.morpheme);
 
 	return word;
 }

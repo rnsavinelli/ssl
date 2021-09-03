@@ -35,7 +35,6 @@
 #define ERROR -1
 
 typedef enum TOKENS {
-	UNDEFINED,
 	CAD,
 	FDT = EOF,
 	SEP = ','
@@ -43,11 +42,10 @@ typedef enum TOKENS {
 
 typedef struct word {
 	token_t token;
-	char * content;
-	size_t content_size;
+	char * morpheme;
 } word_t;
 
-token_t get_token(int character);
+token_t get_token(char ** morpheme);
 
 void print_word(word_t word);
 

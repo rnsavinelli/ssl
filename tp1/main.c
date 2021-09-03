@@ -25,11 +25,7 @@
 
 int main(void)
 {
-	word_t word = {
-		.token = UNDEFINED,
-		.content = NULL,
-		.content_size = 0
-	};
+	word_t word = {FDT, NULL};
 
 	do {
 		word_purge(&word);
