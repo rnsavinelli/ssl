@@ -18,7 +18,7 @@ run:
 	$(CC) $(CFLAGS) $(SOURCES) -o $(OUTPUT) && ./$(OUTPUT)
 
 test:
-	$(CC) $(CFLAGS) $(SOURCES) -o $(OUTPUT) && valgrind -q --tool=memcheck --leak-check=full ./$(OUTPUT) <$(TESTFILE)
+	$(CC) $(CFLAGS) $(SOURCES) -g3 -o $(OUTPUT) && valgrind -q --tool=memcheck --leak-check=full ./$(OUTPUT) <$(TESTFILE)
 
 debug:
 	$(CC) $(CFLAGS) $(SOURCES) -g3 -o $(OUTPUT) && gdb -se $(OUTPUT)
