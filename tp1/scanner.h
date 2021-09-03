@@ -28,16 +28,13 @@
 #include <ctype.h>
 #include <string.h>
 #include <stdbool.h>
-#include <assert.h>
 #include <stdlib.h>
-
-#define not !
-#define ERROR -1
 
 typedef enum TOKENS {
 	CAD,
 	FDT = EOF,
-	SEP = ','
+	SEP = ',',
+	ERR
 } token_t;
 
 typedef struct word {

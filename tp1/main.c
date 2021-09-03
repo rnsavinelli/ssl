@@ -30,7 +30,10 @@ int main(void)
 	do {
 		word_purge(&word);
 		word = get_word();
-		print_word(word);
+
+		if(word.token != ERR)
+			print_word(word);
+			
 	} while (word.token != FDT);
 
 	word_purge(&word);

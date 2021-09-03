@@ -35,7 +35,7 @@ static bool is_escape_sequence(int character)
 }
 
 static bool is_cad(int charcater) {
-	return not(charcater == EOF || charcater == SEP);
+	return !(charcater == EOF || charcater == SEP);
 }
 
 static char * store_character(char **buffer, int character)
@@ -47,19 +47,16 @@ static char * store_character(char **buffer, int character)
 		buffer_size = sizeof(char) + sizeof('\0');
 		*buffer = (char *) malloc(buffer_size);
 
-		if (*buffer != NULL) {
-			*(*buffer) = character;
-			*(*buffer + 1) = '\0';
-		}
+		if (*buffer != NULL)
+			sprintf(*buffer, "%c", (char) character);
 
 	} else {
 
 		buffer_size = strlen(*buffer) + sizeof(char) + sizeof('\0');
 		*buffer = (char *) realloc(*buffer, buffer_size);
 
-		if (*buffer != NULL) {
+		if (*buffer != NULL)
 			sprintf(*buffer, "%s%c", (const char *) *buffer, (char) character);
-		}
 	}
 
 	return *buffer;
@@ -90,7 +87,10 @@ token_t get_token(char ** morpheme)
 
 		switch (character) {
 			case SEP:
-				store_character(morpheme, character);
+				if(store_character(morpheme, character) == NULL) {
+					perror("Memory allocation request failed");
+					return ERR;
+				}	
 				return SEP;
 
 			default:
@@ -98,8 +98,12 @@ token_t get_token(char ** morpheme)
 					if(is_escape_sequence(character)) {
 						break;
 					}
-					store_character(morpheme, character);
-
+					else {
+						if(store_character(morpheme, character) == NULL) {
+							perror("Memory allocation request failed");
+							return ERR;
+						}
+					}
 				} while (is_cad(character = getchar()));
 
 				ungetc(character, stdin);
@@ -107,7 +111,10 @@ token_t get_token(char ** morpheme)
 		}
 	}
 
-	store_character(morpheme, character);
+	if(store_character(morpheme, character) == NULL) {
+		perror("Memory allocation request failed");
+		return ERR;
+	}
 	return FDT;
 }
 
