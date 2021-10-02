@@ -2,7 +2,7 @@
 
 \section{Gramática Léxica}
 
-A continuacion describimos las producciones de la gramática léxica del lenguaje de programación MINI.
+En esta sección se describen las producciones de la gramática léxica del lenguaje de programación MINI.
 
 \subsection{Categorías Léxicas}
 
@@ -28,7 +28,7 @@ A continuacion describimos las producciones de la gramática léxica del lenguaj
     \textit{identificador} \textit{digito} \\
 
 \- \\
-\textit{letra}: uno de \+ \\
+\textit{letra}: una de \+ \\
     \textbf{a b c d e f g h i j k l m n o p q r s t u v w x y z}\\
     \textbf{A B C D E F G H I J K L M N O P Q R S T U V W X Y Z} \\
 
@@ -43,8 +43,17 @@ A continuacion describimos las producciones de la gramática léxica del lenguaj
 \begin{tabbing}
 
 \textit{constante}: \= \+ \\
+    \textit{constante-negativa} \\
+    \textit{constante-positiva} \\
+
+\- \\
+\textit{constante-negativa}: \+ \\
+    \textbf{-} \textit{constante-positiva} \\
+
+\- \\
+\textit{constante-positiva}: \+ \\
     \textit{digito} \\
-    \textit{constante} \textit{digito}\\
+    \textit{constante-positiva} \textit{digito}\\
 
 \- \\
 \textit{digito}: uno de \+ \\
@@ -56,8 +65,12 @@ A continuacion describimos las producciones de la gramática léxica del lenguaj
 
 \begin{tabbing}
 
-\textit{palabra-reservada}: \= uno de \+ \\
-    \textbf{programa entero leer escribir fin-programa}
+\textit{palabra-reservada}: \= \+ \\
+    \textbf{programa}\\
+    \textbf{entero}\\
+    \textbf{leer}\\
+    \textbf{escribir}\\
+    \textbf{fin-programa}
 
 \end{tabbing}
 
@@ -65,16 +78,23 @@ A continuacion describimos las producciones de la gramática léxica del lenguaj
 
 \begin{tabbing}
 
-\textit{operador}: \= uno de \+ \\
+\textit{operador}: \= \+ \\
+    \textit{operador-primario} \\
+    \textit{operador-secundario} \\
+
+\- \\ \textit{operador-primario}: uno de \+ \\
     \textbf{
         +
-        \hspace{4pt}
+        \hspace{3pt}
         -
-        \hspace{4pt}
+    }\\
+
+\- \\ \textit{operador-secundario}: uno de \+ \\
+    \textbf{
         *
-        \hspace{4pt}
+        \hspace{3pt}
         /
-        \hspace{4pt}
+        \hspace{3pt}
         \%
     }
 
@@ -96,10 +116,16 @@ A continuacion describimos las producciones de la gramática léxica del lenguaj
 \textit{caracter-de-puntuación}: \= uno de \+ \\
     \textbf{
         (
-        \hspace{4pt}
+        \hspace{3pt}
         )
-        \hspace{4pt}
+        \hspace{3pt}
         ;
+        \hspace{3pt}
+        ,
     }
 
 \end{tabbing}
+
+\subsection{Caracteres de Puntuación}
+
+Los comentarios son ignorados por el scanner. Los mismos comienzan con // y finalizan con el caracter de nueva línea.
