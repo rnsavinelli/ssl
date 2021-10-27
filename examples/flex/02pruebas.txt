@@ -1,0 +1,4 @@
+palabra seguida de          muchos blancos
+algo y después		un par de tabuladores
+Aqui hay muchos espacios y tabs al final de la línea        		
+a

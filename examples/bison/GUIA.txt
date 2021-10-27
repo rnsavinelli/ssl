@@ -1,0 +1,127 @@
+-------------------01-libro-------------------
+01-libro.y es el ejemplo que da el libro de la cátedra, lo podemos probar con (el símbolo $ indica el prompt de la consola, lo pongo para distinguir comandos de mensajes):
+$ bison 01-libro.y
+$ gcc -o libro 01-libro.tab.c
+$ ./libro 
+aabcc
+Pertenece al LIC
+
+En la corrida anterior ejecuto el programa e ingreso aabcc, puedo enviarlo directo con:
+$ echo aabc | ./libro 
+syntax error
+No pertenece al LIC
+
+Notar que al no usar ninguna directiva la salida de bison es 01-libro.tab.c
+
+-------------------02-testflex-------------------
+02-testflex es similar al ejemplo 7 de flex, pero ahora lo combinamos con el bison. Notar que en flex uso directivas para los nombres de los archivos generados, en particular generamos también en header que incluiremos en bison. En bison dejo los nombres por defecto (usamos -d la invocar bison para indicar que debe generar un header con el nombres estándar, es decir agregando .tab.h)
+
+El header de flex le informa a bison de la existencia de yylex, en tanto que el header de bison le informa a flex la existencia de los tokens y de yylval
+Notar en flex el uso de yyerror usando el buffer msg para armar el mensaje y sprintf para darle forma.
+
+$ flex 02-testflex.l
+$ bison -d 02-testflex.y
+$ gcc -o testflex 02-testflex.c 02-testflex.tab.c -lfl
+$ ./testflex <02-testflex.txt 
+Token: OCTAL		Valor: 0566
+Token: DECIMAL		Valor: 1256
+Token: DECIMAL		Valor: 12UL
+Token: REAL		Valor: .2
+Token: REAL		Valor: 3.2
+Token: REAL		Valor: .2e-5
+Token: REAL		Valor: 5E5
+Token: REAL		Valor: 6e-2
+Token: REAL		Valor: 6.F
+Token: REAL		Valor: 7.E2L
+Token: DECIMAL		Valor: 5lu
+Token: DECIMAL		Valor: 67L
+Token: HEXA		Valor: 0xFb
+Token: HEXA		Valor: 0Xa1b
+Error léxico ENTERO inválido: 5xb
+Error léxico REAL inválido: 5.23.45.32.89F
+Pertenece al LIC
+
+COMENTARIO: notar que dice "Pertenece al LIC" ya que desde el punto de vista del parser no hubo ningún error, ya veremos como solucionarlo en los próximos ejemplos
+Notar en flex el uso de strdup para asignar una copia de yytext a yylval.
+Comentario, en la producción de lista podría haber usado cte en lugar de %empty
+
+-------------------03-registro-------------------
+03-registro es un ejemplo de como usar un registro semántico de tipo struct, para correr el ejemplo:
+
+$ flex 03-registro.l
+$ bison -d 03-registro.y
+$ gcc -o registro 03-registro.c 03-registro.tab.c -lfl
+$ ./registro <03-registro.txt
+Token: DECIMAL		Valor texto: 123	Valor entero: 123
+Token: REAL		Valor texto: .25	Valor real: 0.25
+Token: REAL		Valor texto: 0.50	Valor real: 0.5
+Token: DECIMAL		Valor texto: 0011	Valor entero: 11
+Token: REAL		Valor texto: 2e2	Valor real: 200
+Token: REAL		Valor texto: 3E-7	Valor real: 3e-07
+Token: REAL		Valor texto: 78.	Valor real: 78
+Token: ID		Valor texto: var1
+Token: ID		Valor texto: var2
+Constante decimal mal formada
+
+Pertenece al LIC
+
+Notar que en flex uso yyerror y yylval que son informadas por bison en el header.
+Notar también que el error léxico que detecta flex no es detectado por bison, como en el ejemplo anterior, para que bison lo note debería haber usado una variable global de modo que bison la pueda consultar.
+-------------------04-registroerr-------------------
+04-registroerr es similar al anterior pero si detectamos errores léxicos mediante la variable nerrlex llamamos a YYABORT para indicar error. Es necesario agregar un no terminal nuevo de modo de asegurarnos que la acción que consulte a nerrlex se ejecute al final del análisis. (usamos el mismo archivo de pruebas del ejemplo anterior)
+
+$ flex 04-registroerr.l
+$ bison -d 04-registroerr.y
+$ gcc -o registroerr 04-registroerr.c 04-registroerr.tab.c -lfl
+$ ./registroerr <03-registro.txt
+Token: DECIMAL		Valor texto: 123	Valor entero: 123
+Token: REAL		Valor texto: .25	Valor real: 0.25
+Token: REAL		Valor texto: 0.50	Valor real: 0.5
+Token: DECIMAL		Valor texto: 0011	Valor entero: 11
+Token: REAL		Valor texto: 2e2	Valor real: 200
+Token: REAL		Valor texto: 3E-7	Valor real: 3e-07
+Token: REAL		Valor texto: 78.	Valor real: 78
+Token: ID		Valor texto: var1
+Token: ID		Valor texto: var2
+Constante decimal mal formada
+
+No pertenece al LIC
+-------------------05-union-------------------
+El ejemplo 05-union es similar al de registroerr pero con los siguientes cambios:
+En lugar de una estructura usamos las directiva union. Esto hace que en flex solo cargue el campo que tiene sentido, del mismo modo que lo hacía con estructura. Pero en bison aclaro para cada token que tipo de dato de la unión voy a usar, por eso luego uso el registro directamente, por ejemplo $DECIMAL. Que DECIMAL usa int lo aclaré con %token<num> DECIMAL.
+puedo forzar a elegir otro campo de la unión con $<campo>n, por ejemplo $<str>1 (solo que usé el que corresponde, no tenía sentido usar otro). Si no declaro que tipo de dato es un token, entonces debo usar la notación anterior obligatoriamente.
+Tambien definimos la salida de bison, por eso lo uso sin -d, y usamos yylineno.
+La función yyerror es un poco más elaborada
+(seguimos usando el mismo archivo de entrada que en los dos ejemplos anteriores)
+
+$ flex 05-union.l
+$ bison 05-union.y
+$ gcc -o union 05-unionscanner.c 05-unionparser.c -lfl
+$ ./union <03-registro.txt
+Token: DECIMAL		Valor entero: 123
+Token: REAL		Valor real: 0.25
+Token: REAL		Valor real: 0.5
+Token: DECIMAL		Valor entero: 11
+Token: REAL		Valor real: 200
+Token: REAL		Valor real: 3e-07
+Token: REAL		Valor real: 78
+Token: ID		Valor texto: var1
+Token: ID		Valor texto: var2
+línea #10: Constante decimal mal formada
+
+No pertenece al LIC
+-------------------06-merror-------------------
+El ejemplo 06-merror (por manejo de errores) simplemente espera nros o palabras separados por comas, terminando con !
+Se muestra el uso del no terminal error para que bison siga analizando y el uso de YYABORT
+
+$ flex 06-merror.l
+$ bison 06-merror.y
+$ gcc -o merror 06-merror-scan.c 06-merror-par.c -lfl
+$ ./merror <06-merror.txt
+línea #3: syntax error, unexpected NRO, expecting PALABRA
+línea #4: syntax error, unexpected PALABRA, expecting NRO
+línea #5: Error léxico
+línea #5: syntax error, unexpected '!', expecting PALABRA
+línea #8: syntax error, unexpected $end, expecting '!' or ','
+No pertenece al LIC
+

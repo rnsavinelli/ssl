@@ -1,0 +1,6 @@
++056 octal
+158 decimal
+0x1Fa Hexa
+.25 real
+5.36 real
+0956 sorpresa!!!

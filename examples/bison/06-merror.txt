@@ -1,0 +1,7 @@
+uno,dos  ,tres, cuatro !
+2,5	,	7	!
+uno,2!
+3,tres!
+algo,#@&!
+a,b,c!
+1,2,3

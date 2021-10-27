@@ -1,0 +1,17 @@
+0566
+1256
+12UL
+ignoro las palabras y otros símobolos #@
+.2
+3.2
+.2e-5
+5E5
+6e-2
+6.F
+7.E2L
+5lu
+67L
+0xFb
+0Xa1b
+5xb
+5.23.45

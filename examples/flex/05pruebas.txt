@@ -1,0 +1,7 @@
++0506 primerOctal
+158 primerDecimal
+0x1Fa primerHexa
+.25 primerReal
+5.36 SegundoReal
+0956 segundoOctal segundoDecimal
+23.3 tercerReal

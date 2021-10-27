@@ -1,0 +1,4 @@
+texto en minusculas
+Las MAYÚSCULAS quedan tal cual.
+lo que son numeros 255631 no sufren modificación
+y las letras acentuadas tampoco áéíóú tampoco la ñ
