@@ -535,11 +535,9 @@ char *yytext_ptr;
 #include <stdio.h>
 #include "tokens.h"
 
-#define ERROR -1
-
-#line 540 "scanner.c"
+#line 538 "scanner.c"
 #define YY_NO_INPUT 1
-#line 542 "scanner.c"
+#line 540 "scanner.c"
 
 #define INITIAL 0
 
@@ -754,10 +752,10 @@ YY_DECL
 		}
 
 	{
-#line 54 "scanner.l"
+#line 53 "scanner.l"
 
 
-#line 760 "scanner.c"
+#line 758 "scanner.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -827,55 +825,55 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 56 "scanner.l"
+#line 55 "scanner.l"
 {} /* ignorar nuevas lineas, tabuladores y espacios */
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 58 "scanner.l"
+#line 57 "scanner.l"
 {} /* ignorar comentarios */
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 60 "scanner.l"
+#line 59 "scanner.l"
 { return PALABRA_RESERVADA; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 62 "scanner.l"
+#line 61 "scanner.l"
 { return IDENTIFICADOR; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 64 "scanner.l"
+#line 63 "scanner.l"
 { return CONSTANTE; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 66 "scanner.l"
+#line 65 "scanner.l"
 { return OPERADOR; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 68 "scanner.l"
+#line 67 "scanner.l"
 { return ASIGNACION; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 70 "scanner.l"
+#line 69 "scanner.l"
 { return CARACTER_DE_PUNTUACION; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 72 "scanner.l"
+#line 71 "scanner.l"
 { printf( "ERROR: Caracter no reconocido: %s\n", yytext ); }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 74 "scanner.l"
+#line 73 "scanner.l"
 ECHO;
 	YY_BREAK
-#line 878 "scanner.c"
+#line 876 "scanner.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1851,25 +1849,5 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 74 "scanner.l"
-
-
-char * token_names[] = {
-    "IDENTIFICADOR",
-    "CONSTANTE",
-    "PALABRA RESERVADA",
-    "OPERADOR",
-    "ASIGNACION",
-    "CARACTER DE PUNTUACION"
-};
-
-
-int main(void) {
-    token_t token;
-
-    while((token = yylex()) != 0)
-    	printf("Token: \"%s\", Lexema: \"%s\"\n", token_names[token-1], yytext);
-
-    return 0;
-}
+#line 73 "scanner.l"
 

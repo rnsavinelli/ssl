@@ -25,11 +25,10 @@
 #include <stdio.h>
 #include "tokens.h"
 
-#define ERROR -1
-
 %}
 
 %option outfile="scanner.c"
+%option header-file="scanner.h"
 
 %option noyywrap
 %option nounput
@@ -72,22 +71,3 @@ caracter_de_puntuacion [();,]
 . { printf( "ERROR: Caracter no reconocido: %s\n", yytext ); }
 
 %%
-
-char * token_names[] = {
-    "IDENTIFICADOR",
-    "CONSTANTE",
-    "PALABRA RESERVADA",
-    "OPERADOR",
-    "ASIGNACION",
-    "CARACTER DE PUNTUACION"
-};
-
-
-int main(void) {
-    token_t token;
-
-    while((token = yylex()) != 0)
-    	printf("Token: \"%s\", Lexema: \"%s\"\n", token_names[token-1], yytext);
-
-    return 0;
-}
