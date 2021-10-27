@@ -35,39 +35,41 @@
 %option nounput
 %option noinput
 
-nueva_linea (\n)
-espacio [ \t]
+espacio_en_blanco [ \t\n]
+comentario \/\/[^\n]*
+
 letra [a-zA-Z]
 digito [0-9]
-separador [,]
+
 operador_primario [+-]
 operador_secundario [*/%]
+
+identificador {letra}({letra}|{digito})*
+constante -?{digito}+
+operador {operador_primario}|{operador_secundario}
+palabra_reservada programa|entero|leer|escribir|fin-programa
 asignacion <<
 caracter_de_puntuacion [();,]
-palabra_reservada (programa)|(entero)|(leer)|(escribir)|(fin-programa)
-comentario \/\/[^\n]*
 
 %%
 
-{nueva_linea}+ {} /* ignore new lines */
+{espacio_en_blanco}+ {} /* ignorar nuevas lineas, tabuladores y espacios */
 
-{espacio}+ {} /* ignore whitespaces*/
+{comentario} {} /* ignorar comentarios */
 
 {palabra_reservada} { return PALABRA_RESERVADA; }
 
-{letra}({letra}|{digito})* { return IDENTIFICADOR; }
+{identificador} { return IDENTIFICADOR; }
 
--?{digito}+ { return CONSTANTE; }
+{constante} { return CONSTANTE; }
 
-{operador_primario}|{operador_secundario} { return OPERADOR; }
+{operador} { return OPERADOR; }
 
 {asignacion} { return ASIGNACION; }
 
 {caracter_de_puntuacion} { return CARACTER_DE_PUNTUACION; }
 
-{comentario} {} /* ignore comments */
-
-. { printf( "Unrecognized character: %s\n", yytext );}
+. { printf( "ERROR: Caracter no reconocido: %s\n", yytext ); }
 
 %%
 
