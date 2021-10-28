@@ -4,6 +4,7 @@
 #include "scanner.h"
 
 char *token_names[] = {
+    "",
     "IDENTIFICADOR",
     "CONSTANTE",
     "PALABRA RESERVADA",
@@ -16,7 +17,7 @@ int main(void)
     token_t token;
 
     while ((token = yylex()) != 0)
-        printf("Token: \"%s\", Lexema: \"%s\"\n", token_names[token - 1], yytext);
+        printf("Token: \"%s\", Lexema: \"%s\"\n", token_names[token], yytext);
 
     return 0;
 }

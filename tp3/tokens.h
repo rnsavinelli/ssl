@@ -21,10 +21,11 @@
  */
 
 /* el cero está reservado para EOF (fin de texto) */
-typedef enum TOKENS {
-	IDENTIFICADOR = 1,
-	CONSTANTE,
-	PALABRA_RESERVADA,
+typedef enum TOKENS
+{
+    IDENTIFICADOR = 1,
+    CONSTANTE,
+    PALABRA_RESERVADA,
     OPERADOR,
     ASIGNACION,
     CARACTER_DE_PUNTUACION

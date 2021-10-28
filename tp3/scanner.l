@@ -25,6 +25,8 @@
 #include <stdio.h>
 #include "tokens.h"
 
+#define ERROR_LEXICO(mensaje) printf("[ERROR LÉXICO] %s: %s\n", mensaje, yytext )
+
 %}
 
 %option outfile="scanner.c"
@@ -34,11 +36,12 @@
 %option nounput
 %option noinput
 
-espacio_en_blanco [ \t\n]
+espacio_en_blanco [[:space:]]
 comentario \/\/[^\n]*
+caracter_invalido [~`!@#$^&\[}[\]'"?\\>]
 
-letra [a-zA-Z]
-digito [0-9]
+letra [[:alpha:]]
+digito [[:digit:]]
 
 operador_primario [+-]
 operador_secundario [*/%]
@@ -58,9 +61,15 @@ caracter_de_puntuacion [();,]
 
 {palabra_reservada} { return PALABRA_RESERVADA; }
 
+{palabra_reservada}({caracter_invalido}|{letra}|{digito})+ { ERROR_LEXICO("Palabra reservada inválida"); }
+
 {identificador} { return IDENTIFICADOR; }
 
+{identificador}({caracter_invalido}|{letra}|{digito})+  { ERROR_LEXICO("Identificador inválido"); }
+
 {constante} { return CONSTANTE; }
+
+{constante}({caracter_invalido}|{letra}|{digito})+ { ERROR_LEXICO("Constante inválida"); }
 
 {operador} { return OPERADOR; }
 
@@ -68,6 +77,8 @@ caracter_de_puntuacion [();,]
 
 {caracter_de_puntuacion} { return CARACTER_DE_PUNTUACION; }
 
-. { printf( "ERROR: Caracter no reconocido: %s\n", yytext ); }
+{caracter_invalido}+ { ERROR_LEXICO("Cadena desconocida"); }
+
+. { ERROR_LEXICO("Caracter desconocido"); }
 
 %%
