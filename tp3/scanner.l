@@ -77,7 +77,7 @@ caracter_de_puntuacion [();,]
 
 {caracter_de_puntuacion} { return CARACTER_DE_PUNTUACION; }
 
-{caracter_invalido}+ { ERROR_LEXICO("Cadena desconocida"); }
+{caracter_invalido}+ { ERROR_LEXICO("Cadena inválida"); }
 
 . { ERROR_LEXICO("Caracter desconocido"); }
 
